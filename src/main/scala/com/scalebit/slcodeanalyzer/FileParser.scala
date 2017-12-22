@@ -1,9 +1,10 @@
 package com.scalebit.slcodeanalyzer
 
 import java.io.InputStream
+import java.nio.file.Path
 
 trait FileParser {
 
-  def parse(filePath:String, contents:InputStream):List[GraphItem]
+  def parse(filePath:Path, contents:InputStream):List[GraphItem]
 
 }

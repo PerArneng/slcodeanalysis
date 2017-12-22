@@ -1,15 +1,30 @@
 package com.scalebit.slcodeanalyzer.parsers
 
 import java.io.InputStream
+import java.nio.file.Path
+import javax.xml.parsers.SAXParserFactory
 
 import com.scalebit.slcodeanalyzer.{FileParser, GraphItem}
 
+import scala.xml.XML
+
 class MSBuildParser extends FileParser {
 
-  def parse(filePath:String, contents:InputStream):List[GraphItem] = {
+
+  def parse(filePath:Path, contents:InputStream):List[GraphItem] = {
 
 
-    List(new GraphItem(filePath, "x", List()))
+    val factory = SAXParserFactory.newInstance()
+    factory.setNamespaceAware(false)
+
+    val rootElement = XML.load(contents);
+    val projectReferences = rootElement \\ "ProjectReference"
+    printf("%s\n", projectReferences.size)
+    projectReferences.foreach(n =>
+      printf("%s\n", n.toString())
+    )
+
+    List(new GraphItem(filePath.toString(), "x", List()))
   }
 
 }
