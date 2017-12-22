@@ -1,6 +1,9 @@
 package com.scalebit.slcodeanalyzer
 
-import java.io.File
+import java.io.{File, FileInputStream}
+import java.nio.file.{Path, Paths}
+
+import com.scalebit.slcodeanalyzer.parsers.MSBuildParser
 
 case class CmdLinArgs(sourceDir: File = new File("."))
 
@@ -8,7 +11,32 @@ case class CmdLinArgs(sourceDir: File = new File("."))
 object MainClass {
 
   def start(args: CmdLinArgs): Unit = {
-    printf("starting to analyze: %s", args.sourceDir);
+    printf("starting to analyze: %s", args.sourceDir)
+
+    val rootPath = Paths.get(args.sourceDir.toURI)
+
+    val msBuildParser = new MSBuildParser()
+
+    FileFunctions.recursiveTraverse(rootPath,
+      c => {
+
+        val relative = rootPath.relativize(c)
+        //printf("%s\n", relative.toString)
+
+        if (relative.toString().endsWith(".csproj")) {
+          printf("%s\n", relative.toString)
+
+          val inp = new FileInputStream(c.toFile)
+          val items = msBuildParser.parse(relative.toString(), inp)
+          items.foreach(
+            i => printf("item: %s %s\n", i.id, i.name)
+          )
+        }
+
+      }
+    )
+
+
   }
 
   def main(args: Array[String]):Unit = {
