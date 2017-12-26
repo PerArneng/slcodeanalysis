@@ -28,7 +28,7 @@ object GraphItemFilter {
   def filter(items:List[GraphItem], patterns: List[Pattern]): List[GraphItem] =
     items.filter(i => isIncluded(i.id, patterns))
            .map(i =>
-             GraphItem(i.id, i.name, remove(i.dependencies, patterns))
+             GraphItem(i.id, i.name, remove(i.dependencies, patterns), i.itemType)
            )
 
   def remove(ids:List[String], excludePatterns: List[Pattern]):List[String] =

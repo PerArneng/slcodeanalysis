@@ -6,8 +6,22 @@ import com.scalebit.slcodeanalyzer.{GraphItem, OutputWriter}
 
 class GraphVizOutputWriter extends OutputWriter {
 
-  def formatItem(item:GraphItem):String = String.format(
-    """%s [label = "%s"];""".stripMargin, item.id, item.name)
+  def formatItem(item:GraphItem):String = {
+
+    val color = item.itemType match {
+      case "csproj" => ("gold", "gold4")
+      case "vbproj" => ("aquamarine", "aquamarine4")
+      case _ => ("antiquewhite", "antiquewhite4")
+    }
+
+    val background = color._1
+    val foreground = color._2
+
+    String.format(
+      """%s [label = "%s", fillcolor="%s", color="%s", fontcolor="%s"];""".stripMargin,
+      item.id, item.name, background, foreground, foreground
+    )
+  }
 
   def formatDependency(item:GraphItem, id:String):String = String.format(
     """%s -> %s [label = ""];""".stripMargin, item.id, id)

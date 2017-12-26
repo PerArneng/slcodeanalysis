@@ -32,10 +32,11 @@ class MSBuildParser extends FileParser {
                       .map(n => relPath.getParent.resolve(n.get).normalize())
                       .map(p => Utils.fixId(p.toString))
 
+    val itemType = SystemUtils.getExtension(relPath.toString).toLowerCase
 
     List(GraphItem(Utils.fixId(relPath.toString),
                    SystemUtils.removeFileExtension(relPath.getFileName.toString),
-                   ids.toList))
+                   ids.toList, itemType))
   }
 
 }
