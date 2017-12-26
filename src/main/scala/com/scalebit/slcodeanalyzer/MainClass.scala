@@ -11,28 +11,34 @@ case class CmdLinArgs(sourceDir: File = new File("."))
 object MainClass {
 
   def start(args: CmdLinArgs): Unit = {
-    printf("starting to analyze: %s", args.sourceDir)
+    printf("starting to analyze: %s\n", args.sourceDir)
 
-    val rootPath = Paths.get(args.sourceDir.toURI)
+    val rootPath = Paths.get(args.sourceDir.toURI).normalize()
 
-    val slnParser = new SLNParser()
+    val parsers = List[FileParser](
+      new MSBuildParser()
+    )
 
     FileFunctions.recursiveTraverse(rootPath,
       path => {
 
         val relative = rootPath.relativize(path)
-        //printf("%s\n", relative.toString)
 
-        if (relative.toString().endsWith(".sln")) {
-          printf("%s\n", relative.toString)
+        parsers.foreach(parser => {
 
-          val inp = new FileInputStream(path.toFile)
-          val items = slnParser.parse(path, inp)
-          inp.close()
-          items.foreach(
-            i => printf("item: %s %s\n", i.id, i.name)
-          )
-        }
+          if (parser.canParse(path)) {
+            val inp = new FileInputStream(path.toFile)
+            val items = parser.parse(rootPath, relative, inp)
+            inp.close()
+            items.foreach(
+              i => {
+                printf("item: %s %s\n", i.id, i.name)
+                i.dependencies.foreach(d => printf("  %s\n",d))
+              }
+            )
+          }
+
+        })
 
       }
     )
@@ -54,8 +60,8 @@ object MainClass {
     val cmdLinArgs = CmdLinArgs()
 
     parser.parse(args, cmdLinArgs) match {
-      case Some(cmdLinArgs) =>
-        start(cmdLinArgs)
+      case Some(parsedArgs) =>
+        start(parsedArgs)
 
       case None =>
         parser.help("x")

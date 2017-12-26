@@ -5,6 +5,8 @@ import java.nio.file.Path
 
 trait FileParser {
 
-  def parse(filePath:Path, contents:InputStream):List[GraphItem]
+  def canParse(path:Path):Boolean
+
+  def parse(basePath:Path, relPath:Path, contents:InputStream):List[GraphItem]
 
 }
