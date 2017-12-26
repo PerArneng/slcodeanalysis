@@ -1,0 +1,15 @@
+.*tests?_.*
+.*_unittest.*
+.*testwpfclient.*
+.*testtool.*
+.*testapp.*
+.*testclient.*
+.*_core_net_csproj.*
+.*_general_contract_vbproj.*
+.*_model_common_vbproj.*
+.*_common_contract_vbproj.*
+.*_data_common_vbproj.*
+.*_data_interfaces_vbproj.*
+.*_transportation_contract_vbproj.*
+.*_model_messages_vbproj.*
+.*_resshared_net_csproj.*

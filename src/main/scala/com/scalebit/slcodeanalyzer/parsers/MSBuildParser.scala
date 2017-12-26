@@ -4,7 +4,7 @@ import java.io.{File, InputStream}
 import java.nio.file.{Path, Paths}
 import javax.xml.parsers.SAXParserFactory
 
-import com.scalebit.slcodeanalyzer.{FileParser, GraphItem, SystemUtils}
+import com.scalebit.slcodeanalyzer.{FileParser, GraphItem, SystemUtils, Utils}
 
 import scala.xml.{Elem, Node, XML}
 
@@ -30,10 +30,10 @@ class MSBuildParser extends FileParser {
                       .map(extractProjectReferenceFile)
                       .filter(n => n.nonEmpty)
                       .map(n => relPath.getParent.resolve(n.get).normalize())
-                      .map(p => p.toString)
+                      .map(p => Utils.fixId(p.toString))
 
 
-    List(GraphItem(relPath.toString,
+    List(GraphItem(Utils.fixId(relPath.toString),
                    SystemUtils.removeFileExtension(relPath.getFileName.toString),
                    ids.toList))
   }
