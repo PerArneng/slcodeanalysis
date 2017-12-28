@@ -5,10 +5,9 @@ import java.util.regex.Pattern
 object GraphItemFilter {
 
   def filter(items:List[GraphItem], patterns: List[Pattern]): List[GraphItem] =
-    items.filter(i => isIncluded(i.id, patterns))
-           .map(i =>
-             GraphItem(i.id, i.name, remove(i.references, patterns), i.itemType)
-           )
+    items.map(i => i.copy(references = remove(i.references, patterns),
+                          visible = isIncluded(i.id, patterns))
+             )
 
   def remove(references:List[Reference], excludePatterns: List[Pattern]):List[Reference] =
     references.filter(ref => isIncluded(ref.id, excludePatterns))
@@ -23,7 +22,7 @@ object GraphItemFilter {
 
     patterns.foreach(p => {
       val localMatch = p.matcher(id.id).matches()
-      if (localMatch == true) {
+      if (localMatch) {
         isMatch = true
       }
     })

@@ -70,8 +70,15 @@ object MainClass {
 
     val groupedItems = Grouper.createAllGroups(filteredItems, settings.groups)
 
+    // clean out all non visible items
+    val visibleItems = groupedItems.filter(_.visible)
+    val visibleIds = visibleItems.map(_.id).toSet
+    val cleanedItems = visibleItems.map(i =>
+      i.copy(references = i.references.filter(r => visibleIds.contains(r.id)))
+    )
+
     val output = new GraphVizOutputWriter()
-    output.generate(groupedItems, System.out)
+    output.generate(cleanedItems, System.out)
 
   }
 
