@@ -17,12 +17,15 @@
         .*_transportation_contract_vbproj.*
         .*_model_messages_vbproj.*
         .*_resshared_net_csproj.*
+        .*_ccd_45_.*
         ResSale
         ADODB
     </excludeIdPatterns>
 
+    <!--
     <group name="CCD">
         .*_ccd_.*
     </group>
+    -->
 
 </settings>

@@ -62,12 +62,16 @@ object MainClass {
     pool.shutdown()
     pool.awaitTermination(50, TimeUnit.SECONDS)
 
-    val itemsToProcess = foundItems.toList
+    // make sure that one id is represented once
+    val itemsToProcess = foundItems.groupBy(i => i.id)
+                                   .map(x => x._2.head).toList
 
     val filteredItems = GraphItemFilter.filter(itemsToProcess, settings.execludIds)
 
+    val groupedItems = Grouper.createAllGroups(filteredItems, settings.groups)
+
     val output = new GraphVizOutputWriter()
-    output.generate(filteredItems, System.out)
+    output.generate(groupedItems, System.out)
 
   }
 
