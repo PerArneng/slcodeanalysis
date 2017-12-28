@@ -4,13 +4,28 @@ import java.nio.file.Path
 import java.util.regex.Pattern
 import javax.xml.parsers.SAXParserFactory
 
-import scala.xml.XML
+import scala.xml.{Node, XML}
 
-case class Settings(execludIds:List[Pattern])
+case class Group(name:String, patterns:List[Pattern])
+
+case class Settings(execludIds:List[Pattern], groups:List[Group])
 
 object Settings {
 
-  def default:Settings = Settings(List())
+  def default:Settings = Settings(List(), List())
+
+  def extractPatterns(node:Node):List[Pattern] =
+      node.text.split("\n")
+                .map(line => line.trim)
+                .filter(line => line.length > 0)
+                .map(Pattern.compile)
+                .toList
+
+  def createGroup(node:Node):Group = {
+    val name = node \@ "name"
+    val patterns = extractPatterns(node)
+    Group(name, patterns)
+  }
 
   def fromFile(file:Path):Settings = {
 
@@ -19,14 +34,14 @@ object Settings {
 
     val rootElement = XML.loadFile(file.toFile)
     val excludeIdPatterns = (rootElement \ "excludeIdPatterns")
-                                .map(node => node.text)
-                                .flatMap(contents => contents.split("\n"))
-                                .map(line => line.trim)
-                                .filter(line => line.length > 0)
-                                .map(line => Pattern.compile(line))
+                                .flatMap(extractPatterns)
                                 .toList
 
-    Settings(excludeIdPatterns)
+    val groups = (rootElement \ "group")
+                      .map(createGroup)
+                      .toList
+
+    Settings(excludeIdPatterns, groups)
   }
 
 }
