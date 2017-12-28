@@ -1,29 +1,8 @@
 package com.scalebit.slcodeanalyzer
 
-import java.nio.file.Path
 import java.util.regex.Pattern
-import scala.io.Source
-
-class GraphItemFilter(lines: List[String]) {
-
-  private val patterns = lines.map(l => Pattern.compile(l))
-
-  def filter(items:List[GraphItem]): List[GraphItem] =
-    GraphItemFilter.filter(items, this.patterns)
-
-}
 
 object GraphItemFilter {
-
-  def empty = new GraphItemFilter(List[String]())
-
-  def createFromFile(file:Path):GraphItemFilter =
-    new GraphItemFilter(
-      Source.fromFile(file.toFile).getLines
-                                  .map(l => l.trim)
-                                  .filter(l => !l.startsWith("#"))
-                                  .toList
-    )
 
   def filter(items:List[GraphItem], patterns: List[Pattern]): List[GraphItem] =
     items.filter(i => isIncluded(i.id, patterns))

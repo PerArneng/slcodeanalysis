@@ -14,6 +14,8 @@ class GraphVizOutputWriter extends OutputWriter {
     item.references.map(r => {
       val color = r.referenceType match {
         case "projectreference" => "azure4"
+        case "comreference" => "red"
+        case "libraryreference" => "blue"
         case _ => "black"
       }
       Edge(item.id.id, r.id.id, List(Attribute.color(color)))
@@ -25,6 +27,7 @@ class GraphVizOutputWriter extends OutputWriter {
     val color = item.itemType match {
       case "csproj" => ("gold", "gold4")
       case "vbproj" => ("aquamarine", "aquamarine4")
+      case "vbp" => ("darkseagreen1", "darkseagreen4")
       case _ => ("azure", "azure4")
     }
 
