@@ -3,8 +3,8 @@ package com.scalebit.slcodeanalyzer
 import java.io.{File, FileInputStream}
 import java.nio.file.{Path, Paths}
 
-import com.scalebit.slcodeanalyzer.output.GraphVizOutputWriter
-import com.scalebit.slcodeanalyzer.parsers.{MSBuildParser}
+import com.scalebit.slcodeanalyzer.output.graphviz.GraphVizOutputWriter
+import com.scalebit.slcodeanalyzer.parsers.MSBuildParser
 
 import scala.collection.mutable
 

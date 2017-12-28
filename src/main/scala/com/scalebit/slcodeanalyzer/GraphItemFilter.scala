@@ -19,31 +19,31 @@ object GraphItemFilter {
 
   def createFromFile(file:Path):GraphItemFilter =
     new GraphItemFilter(
-      Source.fromFile(file.toFile()).getLines
-                                    .map(l => l.trim)
-                                    .filter(l => !l.startsWith("#"))
-                                    .toList
+      Source.fromFile(file.toFile).getLines
+                                  .map(l => l.trim)
+                                  .filter(l => !l.startsWith("#"))
+                                  .toList
     )
 
   def filter(items:List[GraphItem], patterns: List[Pattern]): List[GraphItem] =
     items.filter(i => isIncluded(i.id, patterns))
            .map(i =>
-             GraphItem(i.id, i.name, remove(i.dependencies, patterns), i.itemType)
+             GraphItem(i.id, i.name, remove(i.references, patterns), i.itemType)
            )
 
-  def remove(ids:List[String], excludePatterns: List[Pattern]):List[String] =
-    ids.filter(id => isIncluded(id, excludePatterns))
+  def remove(references:List[Reference], excludePatterns: List[Pattern]):List[Reference] =
+    references.filter(ref => isIncluded(ref.id, excludePatterns))
 
-  def isIncluded(id: String, excludePatterns: List[Pattern]):Boolean =
+  def isIncluded(id: Id, excludePatterns: List[Pattern]):Boolean =
     !matchesAny(id, excludePatterns)
 
 
-  def matchesAny(id: String, patterns: List[Pattern]):Boolean = {
+  def matchesAny(id: Id, patterns: List[Pattern]):Boolean = {
 
     var isMatch = false
 
     patterns.foreach(p => {
-      val localMatch = p.matcher(id).matches()
+      val localMatch = p.matcher(id.id).matches()
       if (localMatch == true) {
         isMatch = true
       }
