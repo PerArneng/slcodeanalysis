@@ -28,6 +28,7 @@ class GraphVizOutputWriter extends OutputWriter {
       case "csproj" => ("gold", "gold4")
       case "vbproj" => ("aquamarine", "aquamarine4")
       case "vbp" => ("darkseagreen1", "darkseagreen4")
+      case "tlb" => ("black", "white")
       case _ => ("azure", "azure4")
     }
 

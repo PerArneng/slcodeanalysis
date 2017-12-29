@@ -30,28 +30,23 @@ class VbpParser extends FileParser {
     val idString = findValues("ExeName32", lines)
                     .headOption
                     .map(name => name.replaceAll("\"", ""))
-                    .getOrElse(relPath.getFileName.toString)
+                    .map(SystemUtils.getFileNameWithoutExtension)
+                    .getOrElse(SystemUtils.getFileNameWithoutExtension(relPath))
 
     val referencesFileNames = findValues("Reference", lines)
                           .map(value => value.split("#"))
                           .filter(parts => parts.length >= 5)
                           .map(parts => parts(3))
                           .map(file => SystemUtils.toOSPath(file))
-                          .map(file => Paths.get(file).getFileName.toString)
-                          .map(file => SystemUtils.removeFileExtension(file))
+                          .map(SystemUtils.getFileNameWithoutExtension)
+
 
     val references = referencesFileNames
                           .map(fileName =>
                             Reference(
                                 Id(fileName), "libraryreference"))
-
-    val items = referencesFileNames
-                          .map(fileName => GraphItem(
-                              Id(fileName),
-                              SystemUtils.removeFileExtension(fileName), List() , "binary")
-                          )
-
+    
     List(GraphItem(Id(SystemUtils.removeFileExtension(idString)),
-                   SystemUtils.removeFileExtension(idString), references, "vbp")) ::: items
+                   SystemUtils.removeFileExtension(idString), references, "vbp"))
   }
 }

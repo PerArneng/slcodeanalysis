@@ -1,5 +1,7 @@
 package com.scalebit.slcodeanalyzer
 
+import java.nio.file.{Path, Paths}
+
 object SystemUtils {
 
   def isWindows:Boolean =
@@ -24,6 +26,14 @@ object SystemUtils {
     else
       ""
 
+  def getFileNameWithoutExtension(path:String):String =
+    getFileNameWithoutExtension(Paths.get(path))
+
+  def getFileNameWithoutExtension(path:Path):String =
+    Option.apply(path)
+          .map(_.getFileName)
+          .map(fileName => removeFileExtension(fileName.toString))
+          .getOrElse(path.getFileName.toString)
 
   def hasExtension(file:String, extensions:String*):Boolean =
     extensions.contains(getExtension(file))
