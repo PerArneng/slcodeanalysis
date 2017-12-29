@@ -38,7 +38,7 @@ class GraphVizOutputWriter extends OutputWriter {
     ))
   }
 
-  def itemsToGraph(items: List[GraphItem]):Graph = {
+  def itemsToGraph(items: Seq[GraphItem]):Graph = {
 
     val nodes = scala.collection.mutable.ListBuffer[Node]()
 
@@ -84,7 +84,7 @@ class GraphVizOutputWriter extends OutputWriter {
     lines.mkString("\n")
   }
 
-  override def generate(items: List[GraphItem], out: OutputStream): Unit = {
+  override def generate(items: Seq[GraphItem], out: OutputStream): Unit = {
 
     val printer = new PrintWriter(new OutputStreamWriter(out))
 

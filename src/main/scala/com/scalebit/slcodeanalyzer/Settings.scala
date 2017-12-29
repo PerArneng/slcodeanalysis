@@ -6,20 +6,18 @@ import javax.xml.parsers.SAXParserFactory
 
 import scala.xml.{Node, XML}
 
-case class Group(name:String, patterns:List[Pattern])
+case class Group(name:String, patterns:Seq[String])
 
-case class Settings(execludIds:List[Pattern], groups:List[Group])
+case class Settings(excludeIds:Seq[String], groups:Seq[Group])
 
 object Settings {
 
-  def default:Settings = Settings(List(), List())
+  def default:Settings = Settings(Seq(), Seq())
 
-  def extractPatterns(node:Node):List[Pattern] =
+  def extractPatterns(node:Node):Seq[String] =
       node.text.split("\n")
                 .map(line => line.trim)
                 .filter(line => line.length > 0)
-                .map(Pattern.compile)
-                .toList
 
   def createGroup(node:Node):Group = {
     val name = node \@ "name"
@@ -35,11 +33,9 @@ object Settings {
     val rootElement = XML.loadFile(file.toFile)
     val excludeIdPatterns = (rootElement \ "excludeIdPatterns")
                                 .flatMap(extractPatterns)
-                                .toList
 
     val groups = (rootElement \ "group")
                       .map(createGroup)
-                      .toList
 
     Settings(excludeIdPatterns, groups)
   }

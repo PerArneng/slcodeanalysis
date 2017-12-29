@@ -1,17 +1,18 @@
 package com.scalebit.slcodeanalyzer
 
-import java.io.{File, FileInputStream}
+import java.io.{File, FileInputStream, FileOutputStream}
 import java.nio.file.{Path, Paths}
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.scalebit.slcodeanalyzer.output.graphviz.GraphVizOutputWriter
 import com.scalebit.slcodeanalyzer.parsers.{MSBuildParser, VbpParser}
+import com.scalebit.slcodeanalyzer.transformers.{Cleaner, Excluder, Grouper, Rooter}
 
 import scala.collection.mutable
 
 case class CmdLinArgs(sourceDir: File = new File("."),
                       settings: File = null, poolSize:Int = 1,
-                      root:String = ""
+                      root:String = "", output:Path = Paths.get("-")
                      )
 
 
@@ -24,6 +25,13 @@ object MainClass {
     } else {
       Settings.default
     }
+
+    val transformers = Seq[Seq[GraphItem] => Seq[GraphItem]](
+      Excluder.exclude(settings.excludeIds, _),
+      Grouper.createAllGroups(settings.groups, _),
+      Rooter.itemsFromRoot(args.root, _),
+      Cleaner.clean
+    )
 
     val rootPath = Paths.get(args.sourceDir.toURI).normalize()
 
@@ -68,21 +76,24 @@ object MainClass {
     val itemsToProcess = foundItems.groupBy(i => i.id)
                                    .map(x => x._2.head).toList
 
-    val filteredItems = GraphItemExcluder.exclude(itemsToProcess, settings.execludIds)
 
-    val groupedItems = Grouper.createAllGroups(filteredItems, settings.groups)
+    var processedItems:Seq[GraphItem] = itemsToProcess
 
-    // clean out all non visible items
-    val visibleItems = groupedItems.filter(_.visible)
-    val visibleIds = visibleItems.map(_.id).toSet
-    val cleanedItems = visibleItems.map(i =>
-      i.copy(references = i.references.filter(r => visibleIds.contains(r.id)))
-    )
+    for (transformer <- transformers) {
+      processedItems = transformer.apply(processedItems)
+    }
 
-    val rootedItems = Rooter.itemsFromRoot(args.root, cleanedItems)
+    val writeToStd = args.output.getFileName.toString.equals("-")
+
+    val outputstream = if (writeToStd)
+      System.out
+    else
+      new FileOutputStream(args.output.toFile)
 
     val output = new GraphVizOutputWriter()
-    output.generate(rootedItems, System.out)
+    output.generate(processedItems, outputstream)
+
+    if (!writeToStd) outputstream.close()
 
   }
 
@@ -94,11 +105,15 @@ object MainClass {
       opt[File]('d', "directory").required().valueName("<directory>").
         action( (x, c) => c.copy(sourceDir = x) ).
         text("directory is the directory that holds" +
-             "the files that should be analyzed")
+             " the files that should be analyzed")
+
+      opt[File]('o', "output").required().valueName("<file>").
+        action( (x, c) => c.copy(output = x.toPath) ).
+        text("the output file to write to. A single dash '-' means stdout")
 
       opt[File]('s', "settings").valueName("<file>").
         action( (x, c) => c.copy(settings = x) ).
-        text("a file that contains the settings for how to present the graph")
+        text("a file that contains the settings for how to process the graph")
 
       opt[Int]('p', "thread-pool-size").valueName("<size>").
         action( (x, c) => c.copy(poolSize = x) ).

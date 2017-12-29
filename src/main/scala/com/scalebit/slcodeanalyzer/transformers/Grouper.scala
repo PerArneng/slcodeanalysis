@@ -1,8 +1,12 @@
-package com.scalebit.slcodeanalyzer
+package com.scalebit.slcodeanalyzer.transformers
+
+import java.util.regex.Pattern
+
+import com.scalebit.slcodeanalyzer._
 
 object Grouper {
 
-  def createAllGroups(items:List[GraphItem], groups:List[Group]):List[GraphItem] = {
+  def createAllGroups(groups:Seq[Group], items:Seq[GraphItem]):Seq[GraphItem] = {
 
     var newItems = items
 
@@ -13,19 +17,21 @@ object Grouper {
     newItems
   }
 
-  def updateReferences(item:GraphItem, ids:List[Id], newId:Id):GraphItem =
+  def updateReferences(item:GraphItem, ids:Seq[Id], newId:Id):GraphItem =
     item.copy(
       references =
         item.references.filter(r => !ids.contains(r.id))
           ::: List(Reference(newId, "group"))
     )
 
-  def createGroup(items:List[GraphItem], group:Group):List[GraphItem] = {
+  def createGroup(items:Seq[GraphItem], group:Group):Seq[GraphItem] = {
 
     val groupId = Id(Utils.fixId(group.name))
 
+    val groupPatterns = group.patterns.map(Pattern.compile)
+
     val groupedItems = items.filter(
-          i => GraphItemExcluder.matchesAny(i.id, group.patterns)
+          i => Excluder.matchesAny(i.id, groupPatterns)
     )
 
     val groupedIds = groupedItems.map(_.id).distinct
@@ -35,11 +41,11 @@ object Grouper {
                                       .toList
 
     val restItems = items.filter(
-      i => !GraphItemExcluder.matchesAny(i.id, group.patterns)
+      i => !Excluder.matchesAny(i.id, groupPatterns)
     ).map(item => updateReferences(item, groupedIds, groupId))
 
 
-    restItems ::: List(GraphItem(groupId, group.name, groupReferences, "group"))
+    restItems ++ Seq(GraphItem(groupId, group.name, groupReferences, "group"))
   }
 
 }

@@ -2,19 +2,20 @@ package com.scalebit.slcodeanalyzer
 
 import java.util.regex.Pattern
 
+import com.scalebit.slcodeanalyzer.transformers.Grouper
 import org.scalatest.FlatSpec
 
 
 class GrouperSpec extends FlatSpec {
 
   def createGroup(name:String, patterns:String*):Group =
-    Group(name, patterns.map(Pattern.compile).toList)
+    Group(name, patterns)
 
   "1 item and no groups" should "have an unchanged list of items" in {
 
-    val items = List(GraphItem(Id("test1"), "Test 1", List(), ""))
+    val items = Seq(GraphItem(Id("test1"), "Test 1", List(), ""))
 
-    val groupedItems = Grouper.createAllGroups(items, List())
+    val groupedItems = Grouper.createAllGroups(Seq(), items)
 
     assert(groupedItems.size == 1)
     assert(groupedItems.head.id.id.equals(items.head.id.id))
@@ -31,7 +32,7 @@ class GrouperSpec extends FlatSpec {
 
     val group = createGroup("TestGroup", "test2")
 
-    val groupedItems = Grouper.createAllGroups(items, List(group))
+    val groupedItems = Grouper.createAllGroups(Seq(group), items)
 
     assert(groupedItems.length == 2)
     val test1 = groupedItems.filter(i => i.id.id.equals("test1")).head
@@ -61,7 +62,7 @@ class GrouperSpec extends FlatSpec {
 
     val group = createGroup("TestGroup", "groupee.*")
 
-    val groupedItems = Grouper.createAllGroups(items, List(group))
+    val groupedItems = Grouper.createAllGroups(Seq(group), items)
 
     assert(groupedItems.length == 3)
     val test1 = groupedItems.filter(i => i.id.id.equals("test1")).head
