@@ -36,7 +36,7 @@ class GrouperSpec extends FlatSpec {
 
     assert(groupedItems.length == 2)
     val test1 = groupedItems.filter(i => i.id.id.equals("test1")).head
-    val testGroup = groupedItems.filter(i => i.id.id.equals("testgroup")).head
+    val testGroup = groupedItems.filter(i => i.id.id.equals("TestGroup")).head
 
 
 
@@ -66,10 +66,8 @@ class GrouperSpec extends FlatSpec {
 
     assert(groupedItems.length == 3)
     val test1 = groupedItems.filter(i => i.id.id.equals("test1")).head
-    val testGroup = groupedItems.filter(i => i.id.id.equals("testgroup")).head
+    val testGroup = groupedItems.filter(i => i.id.id.equals("TestGroup")).head
     assert(testGroup.references.size == 1)
-
-
 
   }
 }

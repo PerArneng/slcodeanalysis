@@ -26,7 +26,7 @@ object Grouper {
 
   def createGroup(items:Seq[GraphItem], group:Group):Seq[GraphItem] = {
 
-    val groupId = Id(Utils.fixId(group.name))
+    val groupId = Id(group.name)
 
     val groupPatterns = group.patterns.map(Pattern.compile)
 

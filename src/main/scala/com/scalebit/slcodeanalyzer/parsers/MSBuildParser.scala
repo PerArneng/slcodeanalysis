@@ -25,7 +25,7 @@ class MSBuildParser extends FileParser {
                     .map(extractProjectReferenceFile)
                     .filter(n => n.nonEmpty)
                     .map(n => relPath.getParent.resolve(n.get).normalize())
-                    .map(p => Utils.fixId(p.toString))
+                    .map(p => p.toString)
                     .map(idString => Reference(Id(idString), "projectreference"))
                     .toList
   }
@@ -57,7 +57,7 @@ class MSBuildParser extends FileParser {
 
     val itemType = SystemUtils.getExtension(relPath.toString).toLowerCase
 
-    List(GraphItem(Id(Utils.fixId(relPath.toString)),
+    List(GraphItem(Id(relPath.toString),
                    SystemUtils.removeFileExtension(relPath.getFileName.toString),
                    projectReferences ::: comReferences, itemType))
   }

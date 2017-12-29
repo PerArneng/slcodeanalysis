@@ -66,10 +66,10 @@ class GraphVizOutputWriter extends OutputWriter {
               .mkString("[", ", ", "]")
 
   def renderNode(node:Node):String =
-    s"  ${node.id} ${renderAttributes(node.attributes)};"
+    s"""  "${node.id}" ${renderAttributes(node.attributes)};"""
 
   def renderEdge(edge:Edge):String =
-    s"  ${edge.sourceId} -> ${edge.targetId} ${renderAttributes(edge.attributes)};"
+    s"""  "${edge.sourceId}" -> "${edge.targetId}" ${renderAttributes(edge.attributes)};"""
 
   def renderGraph(graph:Graph):String = {
 

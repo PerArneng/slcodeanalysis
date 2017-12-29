@@ -43,11 +43,11 @@ class VbpParser extends FileParser {
     val references = referencesFileNames
                           .map(fileName =>
                             Reference(
-                                Id(fileName.replace('~', '_').replace('.', '_')), "libraryreference"))
+                                Id(fileName), "libraryreference"))
 
     val items = referencesFileNames
                           .map(fileName => GraphItem(
-                              Id(fileName.replace('~', '_').replace('.', '_')),
+                              Id(fileName),
                               SystemUtils.removeFileExtension(fileName), List() , "binary")
                           )
 
