@@ -6,7 +6,7 @@ import com.scalebit.slcodeanalyzer._
 
 object Grouper {
 
-  def createAllGroups(groups:Seq[Group], items:Seq[GraphItem]):Seq[GraphItem] = {
+  def createAllGroups(groups:Seq[Group], items:Seq[GraphItem]):Transformation = {
 
     var newItems = items
 
@@ -14,7 +14,7 @@ object Grouper {
       newItems = createGroup(newItems, group)
     })
 
-    newItems
+    Transformation("grouper", newItems, Seq())
   }
 
   def updateReferences(item:GraphItem, ids:Seq[Id], newId:Id):GraphItem =

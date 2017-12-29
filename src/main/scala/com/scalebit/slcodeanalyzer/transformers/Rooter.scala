@@ -1,6 +1,6 @@
 package com.scalebit.slcodeanalyzer.transformers
 
-import com.scalebit.slcodeanalyzer.{GraphItem, Id}
+import com.scalebit.slcodeanalyzer.{GraphItem, Id, Transformation}
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -9,11 +9,11 @@ import scala.collection.mutable.ListBuffer
 object Rooter {
 
 
-  def itemsFromRoot(rootName:String, items:Seq[GraphItem]):Seq[GraphItem] = {
+  def itemsFromRoot(rootName:String, items:Seq[GraphItem]):Transformation = {
 
     val roots = items.filter(i => i.name.equals(rootName))
     if (roots.length < 1) {
-      return items
+      return Transformation("rooter", items, Seq(s"no root found by the name '$rootName'"))
     }
 
     val rootId = roots.head.id
@@ -25,7 +25,7 @@ object Rooter {
 
     findItems(ListBuffer(rootId), itemMap, foundItems)
 
-    foundItems.values.toList
+    Transformation("rooter", foundItems.values.toList, Seq())
   }
 
   @tailrec

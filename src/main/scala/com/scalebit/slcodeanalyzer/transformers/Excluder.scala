@@ -3,15 +3,17 @@ package com.scalebit.slcodeanalyzer.transformers
 
 import java.util.regex.Pattern
 
-import com.scalebit.slcodeanalyzer.{GraphItem, Id, Reference}
+import com.scalebit.slcodeanalyzer.{GraphItem, Id, Reference, Transformation}
 
 object Excluder  {
 
-  def exclude(patterns:Seq[String], items:Seq[GraphItem]):Seq[GraphItem] = {
+  def exclude(patterns:Seq[String], items:Seq[GraphItem]):Transformation = {
     val compiledPatterns = patterns.map(Pattern.compile)
-    items.map(i => i.copy(references = remove(i.references, compiledPatterns).toList,
+    val newItems = items.map(i => i.copy(references = remove(i.references, compiledPatterns).toList,
       visible = isIncluded(i.id, compiledPatterns))
     )
+
+    Transformation("excluder", newItems, Seq())
   }
 
   def remove(references:Seq[Reference], excludePatterns: Seq[Pattern]):Seq[Reference] =

@@ -15,7 +15,7 @@ class GrouperSpec extends FlatSpec {
 
     val items = Seq(GraphItem(Id("test1"), "Test 1", List(), ""))
 
-    val groupedItems = Grouper.createAllGroups(Seq(), items)
+    val groupedItems = Grouper.createAllGroups(Seq(), items).items
 
     assert(groupedItems.size == 1)
     assert(groupedItems.head.id.id.equals(items.head.id.id))
@@ -32,7 +32,7 @@ class GrouperSpec extends FlatSpec {
 
     val group = createGroup("TestGroup", "test2")
 
-    val groupedItems = Grouper.createAllGroups(Seq(group), items)
+    val groupedItems = Grouper.createAllGroups(Seq(group), items).items
 
     assert(groupedItems.length == 2)
     val test1 = groupedItems.filter(i => i.id.id.equals("test1")).head
@@ -62,7 +62,7 @@ class GrouperSpec extends FlatSpec {
 
     val group = createGroup("TestGroup", "groupee.*")
 
-    val groupedItems = Grouper.createAllGroups(Seq(group), items)
+    val groupedItems = Grouper.createAllGroups(Seq(group), items).items
 
     assert(groupedItems.length == 3)
     val test1 = groupedItems.filter(i => i.id.id.equals("test1")).head

@@ -6,7 +6,7 @@ import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.scalebit.slcodeanalyzer.output.graphviz.GraphVizOutputWriter
 import com.scalebit.slcodeanalyzer.parsers.{MSBuildParser, VbpParser}
-import com.scalebit.slcodeanalyzer.transformers.{Cleaner, Excluder, Grouper, Rooter}
+import com.scalebit.slcodeanalyzer.transformers._
 import com.typesafe.scalalogging.Logger
 
 import scala.collection.mutable
@@ -34,7 +34,8 @@ object MainClass {
 
     logger.info("initialising transformers")
 
-    val transformers = Seq[Seq[GraphItem] => Seq[GraphItem]](
+    val transformers = Seq[Seq[GraphItem] => Transformation](
+      DuplicationRemover.remove,
       Excluder.exclude(settings.excludeIds, _),
       Grouper.createAllGroups(settings.groups, _),
       Rooter.itemsFromRoot(args.root, _),
@@ -94,20 +95,18 @@ object MainClass {
 
     logger.info("found {} graph items", foundItems.length)
 
-
-    // make sure that one id is represented once
-    val itemsToProcess = foundItems.groupBy(i => i.id)
-                                   .map(x => x._2.head).toList
-
-    logger.info("{} unique graph items", itemsToProcess.length)
-
-    var processedItems:Seq[GraphItem] = itemsToProcess
+    var transformation = Transformation("initial", foundItems, Seq())
 
     logger.info("starting transformation")
 
     for (transformer <- transformers) {
-      processedItems = transformer.apply(processedItems)
+      transformation = transformer.apply(transformation.items)
+      val transformationLog = Logger(transformation.name)
+      transformation.messages.foreach(m => transformationLog.info(m))
+      transformationLog.info("finished ending with {} items", transformation.items.length)
     }
+
+    val processedItems = transformation.items
 
     logger.info("{} graph items after transformation", processedItems.length)
 
