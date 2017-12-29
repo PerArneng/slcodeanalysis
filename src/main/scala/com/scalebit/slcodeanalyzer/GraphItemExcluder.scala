@@ -2,9 +2,9 @@ package com.scalebit.slcodeanalyzer
 
 import java.util.regex.Pattern
 
-object GraphItemFilter {
+object GraphItemExcluder {
 
-  def filter(items:List[GraphItem], patterns: List[Pattern]): List[GraphItem] =
+  def exclude(items:List[GraphItem], patterns: List[Pattern]): List[GraphItem] =
     items.map(i => i.copy(references = remove(i.references, patterns),
                           visible = isIncluded(i.id, patterns))
              )

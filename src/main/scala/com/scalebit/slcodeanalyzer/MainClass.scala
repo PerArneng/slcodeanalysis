@@ -10,7 +10,9 @@ import com.scalebit.slcodeanalyzer.parsers.{MSBuildParser, VbpParser}
 import scala.collection.mutable
 
 case class CmdLinArgs(sourceDir: File = new File("."),
-                      settings: File = null, poolSize:Int = 1)
+                      settings: File = null, poolSize:Int = 1,
+                      root:String = ""
+                     )
 
 
 object MainClass {
@@ -66,7 +68,7 @@ object MainClass {
     val itemsToProcess = foundItems.groupBy(i => i.id)
                                    .map(x => x._2.head).toList
 
-    val filteredItems = GraphItemFilter.filter(itemsToProcess, settings.execludIds)
+    val filteredItems = GraphItemExcluder.exclude(itemsToProcess, settings.execludIds)
 
     val groupedItems = Grouper.createAllGroups(filteredItems, settings.groups)
 
@@ -77,8 +79,10 @@ object MainClass {
       i.copy(references = i.references.filter(r => visibleIds.contains(r.id)))
     )
 
+    val rootedItems = Rooter.itemsFromRoot(args.root, cleanedItems)
+
     val output = new GraphVizOutputWriter()
-    output.generate(cleanedItems, System.out)
+    output.generate(rootedItems, System.out)
 
   }
 
@@ -99,6 +103,10 @@ object MainClass {
       opt[Int]('p', "thread-pool-size").valueName("<size>").
         action( (x, c) => c.copy(poolSize = x) ).
         text("the size of the thread pool")
+
+      opt[String]('r', "root").valueName("<root name>").
+        action( (x, c) => c.copy(root = x) ).
+        text("show only this root and all the dependencies recursively")
     }
 
     val cmdLinArgs = CmdLinArgs()
