@@ -33,6 +33,8 @@ object Settings {
     val rootElement = XML.loadFile(file.toFile)
     val excludeIdPatterns = (rootElement \ "excludeIdPatterns")
                                 .flatMap(extractPatterns)
+                                .map(_.trim)
+                                .filter(!_.startsWith("//"))
 
     val groups = (rootElement \ "group")
                       .map(createGroup)

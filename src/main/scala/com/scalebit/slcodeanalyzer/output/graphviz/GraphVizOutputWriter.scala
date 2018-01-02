@@ -66,8 +66,13 @@ class GraphVizOutputWriter extends OutputWriter {
     attributes.map(attr => s"""${attr.key}="${attr.value}"""")
               .mkString("[", ", ", "]")
 
-  def renderNode(node:Node):String =
-    s"""  "${node.id}" ${renderAttributes(node.attributes)};"""
+  def renderNode(node:Node):String = {
+    val id:String = node.id match {
+      case "node" | "edge" => node.id
+      case _ => s""" "${node.id}" """.trim()
+    }
+    s"""  $id ${renderAttributes(node.attributes)};"""
+  }
 
   def renderEdge(edge:Edge):String =
     s"""  "${edge.sourceId}" -> "${edge.targetId}" ${renderAttributes(edge.attributes)};"""
