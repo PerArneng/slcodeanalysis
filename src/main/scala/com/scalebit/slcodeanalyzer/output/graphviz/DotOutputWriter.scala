@@ -7,7 +7,7 @@ import com.scalebit.slcodeanalyzer.{GraphItem, Id, OutputWriter}
 import scala.collection.mutable.ListBuffer
 
 
-class GraphVizOutputWriter extends OutputWriter {
+object DotOutputWriter extends OutputWriter {
 
   def itemToEdges(item:GraphItem):List[Edge] = {
 

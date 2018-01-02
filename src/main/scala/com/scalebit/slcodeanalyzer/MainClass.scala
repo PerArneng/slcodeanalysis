@@ -1,25 +1,20 @@
 package com.scalebit.slcodeanalyzer
 
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.{File, FileInputStream, FileOutputStream, OutputStream}
 import java.nio.file.{Path, Paths}
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
-import com.scalebit.slcodeanalyzer.output.graphviz.GraphVizOutputWriter
+import com.scalebit.slcodeanalyzer.output.graphviz.{DotOutputWriter, SvgOutputWriter}
 import com.scalebit.slcodeanalyzer.parsers.{MSBuildParser, TlbParser, VbpParser}
 import com.scalebit.slcodeanalyzer.transformers._
 import com.typesafe.scalalogging.Logger
 
 import scala.collection.mutable
 
-case class CmdLinArgs(sourceDir: File = new File("."),
-                      settings: File = null, poolSize:Int = 1,
-                      root:String = "", output:Path = Paths.get("-")
-                     )
-
 
 object MainClass {
 
-  def start(args: CmdLinArgs, logger:Logger): Unit = {
+  def start(args:CommandlineArguments, logger:Logger): Unit = {
 
     val settings = if (args.settings != null) {
       logger.info("reading settings from file")
@@ -28,6 +23,22 @@ object MainClass {
       logger.info("using default settings")
       Settings.default
     }
+
+    val outputWriterOpt:Option[(Seq[GraphItem], OutputStream) => Unit] =
+      args.format match {
+        case "dot" => Some(DotOutputWriter.generate)
+        case "svg" => Some(SvgOutputWriter.generate)
+        case _ => None
+      }
+
+    if (outputWriterOpt.isEmpty) {
+      logger.error("output format not supported: '{}'", args.format)
+      return
+    } else {
+      logger.info("using output format: '{}'", args.format)
+    }
+
+    val writeOutputFn = outputWriterOpt.get
 
     logger.info("found {} groups", settings.groups.length)
     logger.info("found {} exclude id patterns", settings.excludeIds.length)
@@ -122,10 +133,9 @@ object MainClass {
       new FileOutputStream(args.output.toFile)
     }
 
-    val output = new GraphVizOutputWriter()
 
     logger.info("writing the graph")
-    output.generate(processedItems, outputstream)
+    writeOutputFn(processedItems, outputstream)
 
     if (!writeToStd) outputstream.close()
 
@@ -137,45 +147,19 @@ object MainClass {
     val logger = Logger("Main")
     logger.info("slcodeanalyzer starting")
 
-    val parser = new scopt.OptionParser[CmdLinArgs]("slcodeanalyzer") {
-      head("slcodeanalyzer", "0.1")
 
-      opt[File]('d', "directory").required().valueName("<directory>").
-        action( (x, c) => c.copy(sourceDir = x) ).
-        text("directory is the directory that holds" +
-             " the files that should be analyzed")
+    val cmdLinArgs = CommandlineArguments.parse(args)
 
-      opt[File]('o', "output").required().valueName("<file>").
-        action( (x, c) => c.copy(output = x.toPath) ).
-        text("the output file to write to. A single dash '-' means stdout")
-
-      opt[File]('s', "settings").valueName("<file>").
-        action( (x, c) => c.copy(settings = x) ).
-        text("a file that contains the settings for how to process the graph")
-
-      opt[Int]('p', "thread-pool-size").valueName("<size>").
-        action( (x, c) => c.copy(poolSize = x) ).
-        text("the size of the thread pool")
-
-      opt[String]('r', "root").valueName("<root name>").
-        action( (x, c) => c.copy(root = x) ).
-        text("show only this root and all the dependencies recursively")
-    }
-
-    val cmdLinArgs = CmdLinArgs()
-
-    parser.parse(args, cmdLinArgs) match {
+    cmdLinArgs match {
       case Some(parsedArgs) =>
         start(parsedArgs, logger)
 
       case None =>
         logger.error("failed to parse commandline arguments")
-        parser.help("x")
+        CommandlineArguments.help()
         System.exit(-1)
     }
 
   }
-
-
 
 }
