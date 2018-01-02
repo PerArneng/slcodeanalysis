@@ -15,7 +15,7 @@ object DanglingReferenceRemover {
       if (existingIds.contains(reference.id)) {
         newReferences += reference
       } else {
-        messages += s"removed: '${item.id}' -> '${reference.id}'"
+        messages += s"removed: '${item.id}' -> '${reference.id}' (${reference.description.getOrElse("N/A")})"
       }
     }
 

@@ -2,29 +2,29 @@
 <settings>
 
     <excludeIdPatterns>
-        .*tests?_.*
-        .*_unittest.*
+        .*tests?..*
+        .*.unittest.*
         .*testwpfclient.*
         .*testtool.*
         .*testapp.*
         .*testclient.*
-        .*_core_net_csproj.*
-        .*_general_contract_vbproj.*
-        .*_model_common_vbproj.*
-        .*_common_contract_vbproj.*
-        .*_data_common_vbproj.*
-        .*_data_interfaces_vbproj.*
-        .*_transportation_contract_vbproj.*
-        .*_model_messages_vbproj.*
-        .*_resshared_net_csproj.*
-        .*_ccd_45_.*
+        .*.core.net.csproj.*
+        .*.general.contract.vbproj.*
+        .*.model.common.vbproj.*
+        .*.common.contract.vbproj.*
+        .*.data.common.vbproj.*
+        .*.data.interfaces.vbproj.*
+        .*.transportation.contract.vbproj.*
+        .*.model.messages.vbproj.*
+        .*.resshared.net.csproj.*
+        .*.ccd.45.*
         ResSale
         ADODB
     </excludeIdPatterns>
 
     <!--
     <group name="CCD">
-        .*_ccd_.*
+        .*.ccd.*
     </group>
     -->
 
