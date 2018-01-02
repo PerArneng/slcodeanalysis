@@ -36,11 +36,12 @@ object MainClass {
 
     val transformers = Seq[Seq[GraphItem] => Transformation](
       DuplicationRemover.remove,
-      Excluder.exclude(settings.excludeIds, _),
+      DanglingReferenceRemover.remove,
       Grouper.createAllGroups(settings.groups, _),
       Rooter.itemsFromRoot(args.root, _),
-      DanglingReferenceRemover.remove,
-      InvisibleRemover.remove
+      Excluder.exclude(settings.excludeIds, _),
+      InvisibleRemover.remove,
+      DanglingReferenceRemover.remove
     )
 
     logger.info("using {} transformers", transformers.length)
