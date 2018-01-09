@@ -16,3 +16,4 @@ case class GraphItem(id:Id, name:String,
 case class Transformation(name:String,
                           items:Seq[GraphItem],
                           messages:Seq[String])
+

@@ -38,7 +38,7 @@ object CommandlineArguments {
 
     opt[String]('f', "format").valueName("<output format>").
       action((x, c) => c.copy(format = x)).
-      text("the output format of the diagram. 'dot' or 'svg'")
+      text("the output format of the diagram. 'dot' is default. Only 'dot' is supported right now")
   }
 
   def help(): Unit = {
