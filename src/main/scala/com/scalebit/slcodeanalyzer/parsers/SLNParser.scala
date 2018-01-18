@@ -3,7 +3,7 @@ package com.scalebit.slcodeanalyzer.parsers
 import java.io.InputStream
 import java.nio.file.{Path, Paths}
 
-import com.scalebit.slcodeanalyzer.{FileParser, GraphItem, SystemUtils}
+import com.scalebit.slcodeanalyzer._
 
 import scala.io.Source
 
@@ -31,17 +31,23 @@ class SLNParser extends FileParser {
         ).head
   }
 
+  def toReference(relPath:Path, projectRef: ProjectRef):Reference = {
+    Reference(Id(relPath.resolve(projectRef.file).toString), "slnreference")
+  }
+
   override def parse(basePath:Path, relPath:Path, contents:InputStream):List[GraphItem] = {
 
     def isProjectLine(str:String):Boolean = str.trim().startsWith("Project(")
 
-    Source.fromInputStream(contents, "UTF-8").getLines()
-        .filter(isProjectLine)
-        .map(parseProjectRef)
-        .foreach(i => printf("  %s\n", i))
+    val references = Source.fromInputStream(contents, "UTF-8").getLines()
+                              .filter(isProjectLine)
+                              .map(parseProjectRef)
+                              .map(r => toReference(relPath.getParent, r))
+                              .toList
 
-
-    List()
+    List(GraphItem(Id(relPath.toString),
+          SystemUtils.getFileNameWithoutExtension(relPath),
+          references, "sln",  true, Some(relPath.toString)))
   }
 
 }

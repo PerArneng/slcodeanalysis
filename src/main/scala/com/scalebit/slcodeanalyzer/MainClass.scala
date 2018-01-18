@@ -5,7 +5,7 @@ import java.nio.file.{Path, Paths}
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.scalebit.slcodeanalyzer.output.graphviz.{DotOutputWriter, SvgOutputWriter}
-import com.scalebit.slcodeanalyzer.parsers.{MSBuildParser, TlbParser, VbpParser}
+import com.scalebit.slcodeanalyzer.parsers.{MSBuildParser, SLNParser, TlbParser, VbpParser}
 import com.scalebit.slcodeanalyzer.transformers._
 import com.typesafe.scalalogging.Logger
 
@@ -62,7 +62,7 @@ object MainClass {
     logger.info("analyzing root path '{}'", rootPath.toString)
 
     val parsers = List[FileParser](
-      new MSBuildParser, new VbpParser, new TlbParser
+      new MSBuildParser, new VbpParser, new TlbParser, new SLNParser
     )
 
     logger.info("using {} parsers", parsers.length)

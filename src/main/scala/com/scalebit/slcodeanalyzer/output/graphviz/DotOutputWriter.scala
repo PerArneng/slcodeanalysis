@@ -16,6 +16,7 @@ object DotOutputWriter extends OutputWriter {
         case "projectreference" => "azure4"
         case "comreference" => "red"
         case "libraryreference" => "blue"
+        case "slnreference" => "green"
         case _ => "black"
       }
       Edge(item.id.id, r.id.id, List(Attribute.color(color)))
@@ -29,6 +30,7 @@ object DotOutputWriter extends OutputWriter {
       case "vbproj" => ("aquamarine", "aquamarine4")
       case "vbp" => ("darkseagreen1", "darkseagreen4")
       case "tlb" => ("black", "white")
+      case "sln" => ("coral", "coral4")
       case _ => ("azure", "azure4")
     }
 
