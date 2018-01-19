@@ -26,7 +26,7 @@ class SLNParser extends FileParser {
         .map(part => part.split(","))
         .map(parts =>
            ProjectRef(trim(parts(0)),
-                      Paths.get(trim(parts(1))),
+                      Paths.get(SystemUtils.toOSPath(trim(parts(1)))).normalize(),
                       trim(parts(2)))
         ).head
   }
